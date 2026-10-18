@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Judy's Shopping Cat</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        catPink: '#FF85A1',
+                        catPinkDark: '#F25C7F',
+                        catPurple: '#7058B8',
+                        catBg: '#FFF5F7',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth transition for drawer */
+        .cart-drawer {
+            transition: transform 0.3s ease-in-out;
+        }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #FF85A1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #F25C7F;
+        }
+    </style>
+</head>
+<body class="bg-catBg font-sans text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <!-- ================= HEADER SECTION ================= -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-sm border-b border-pink-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                
+                <!-- Logo / Brand Name -->
+                <div class="flex items-center justify-between w-full md:w-auto">
+                    <a href="#" class="flex items-center gap-3 group">
+                        <div class="w-12 h-12 bg-catPink rounded-2xl flex items-center justify-center text-white shadow-md transform group-hover:rotate-6 transition-all duration-300">
+                            <i class="fa-solid font-bold fa-cat text-2xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800 tracking-tight leading-none group-hover:text-catPink transition-colors">
+                                Judy's <span class="text-catPink">Shopping Cat</span>
+                            </h1>
+                            <p class="text-xs text-gray-500 font-medium tracking-wide">Purr-fect Deals Every Day!</p>
+                        </div>
+                    </a>
+
+                    <!-- Mobile Cart Trigger Button -->
+                    <button id="mobileCartBtn" class="md:hidden relative p-2 text-gray-700 hover:text-catPink focus:outline-none">
+                        <i class="fa-solid fa-cart-shopping text-2xl"></i>
+                        <span id="mobileCartBadge" class="absolute -top-1 -right-1 bg-catPink text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="w-full md:max-w-xl relative">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search for items, cat toys, electronics, fashion..." 
+                            class="w-full pl-11 pr-24 py-2.5 rounded-full border-2 border-pink-100 focus:border-catPink focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all text-sm bg-gray-50 focus:bg-white">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <button id="clearSearchBtn" class="hidden absolute right-20 inset-y-0 px-2 text-gray-400 hover:text-gray-600">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <button id="searchBtn" class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-catPink hover:bg-catPinkDark text-white font-medium text-xs rounded-full transition-all flex items-center gap-1 shadow-sm">
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desktop Cart & Wishlist Controls -->
+                <div class="hidden md:flex items-center gap-4">
+                    <button class="flex items-center gap-2 text-gray-600 hover:text-catPink font-medium text-sm transition-colors">
+                        <i class="fa-regular fa-heart text-lg"></i>
+                        <span>Wishlist</span>
+                    </button>
+                    <button id="cartBtn" class="relative bg-catPink/10 hover:bg-catPink text-catPink hover:text-white px-4 py-2 rounded-full font-medium text-sm flex items-center gap-2 transition-all duration-200 border border-pink-200">
+                        <i class="fa-solid fa-bag-shopping text-lg"></i>
+                        <span>Cart</span>
+                        <span id="cartBadge" class="bg-catPink text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= HERO BANNER ================= -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+        <div class="bg-gradient-to-r from-pink-400 via-pink-300 to-purple-400 rounded-3xl p-6 sm:p-10 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between">
+            <div class="z-10 max-w-lg text-center md:text-left mb-6 md:mb-0">
+                <span class="bg-white/20 text-white text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold backdrop-blur-sm">Special Weekend Offer</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold mt-3 leading-tight">Meow-velous Savings Up To 50% Off!</h2>
+                <p class="mt-2 text-pink-50 text-sm sm:text-base">Discover curated premium products from electronics to cute accessories for you and your pets.</p>
+                <a href="#catalog" class="inline-block mt-4 bg-white text-catPinkDark font-bold px-6 py-2.5 rounded-full shadow-md hover:bg-pink-50 transition-all hover:shadow-lg transform hover:-translate-y-0.5">Shop Now <i class="fa-solid fa-arrow-right ml-1"></i></a>
+            </div>
+            <div class="z-10 flex items-center justify-center">
+                <div class="w-40 h-40 sm:w-52 sm:h-52 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md border border-white/30 text-7xl sm:text-8xl shadow-inner">
+                    🐱📦
+                </div>
+            </div>
+            <!-- Decorative Elements -->
+            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="absolute -left-10 -top-10 w-48 h-48 bg-purple-500/20 rounded-full blur-2xl"></div>
+        </div>
+    </section>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main id="catalog" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Controls: Categories, Filter & Sorting -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8 pb-4 border-b border-pink-100">
+            <!-- Category Pills -->
+            <div id="categoryContainer" class="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
+                <!-- Dynamic categories loaded via JS -->
+            </div>
+
+            <!-- Sorting & Results Count -->
+            <div class="flex items-center justify-between lg:justify-end gap-4 shrink-0">
+                <span id="resultsCount" class="text-xs font-medium text-gray-500">Showing all products</span>
+                <div class="flex items-center gap-2">
+                    <label for="sortSelect" class="text-xs text-gray-500 font-medium shrink-0">Sort By:</label>
+                    <select id="sortSelect" class="bg-white border border-pink-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:border-catPink text-gray-700 shadow-sm cursor-pointer">
+                        <option value="featured">Featured</option>
+                        <option value="low-high">Price: Low to High</option>
+                        <option value="high-low">Price: High to Low</option>
+                        <option value="rating">Top Rated</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Dynamic Product Cards loaded via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16">
+            <div class="w-24 h-24 bg-pink-100 text-catPink rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">
+                <i class="fa-solid fa-cat"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-700">No goods found!</h3>
+            <p class="text-gray-500 text-sm mt-1">We couldn't find anything matching your search. Try another keyword!</p>
+            <button id="resetSearchBtn" class="mt-4 px-5 py-2 bg-catPink text-white text-xs font-semibold rounded-full hover:bg-catPinkDark transition-colors">Clear Search Filters</button>
+        </div>
+
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="bg-white border-t border-pink-100 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fa-solid fa-cat text-catPink text-xl"></i>
+                        <span class="font-bold text-gray-800">Judy's Shopping Cat</span>
+                    </div>
+                    <p class="text-xs text-gray-500 leading-relaxed">Your one-stop boutique store delivering top-grade goods with speed, joy, and feline flair!</p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-700 mb-3">Quick Links</h4>
+                    <ul class="space-y-2 text-xs text-gray-500">
+                        <li><a href="#" class="hover:text-catPink transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-catPink transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-catPink transition-colors">Press & News</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-700 mb-3">Customer Support</h4>
+                    <ul class="space-y-2 text-xs text-gray-500">
+                        <li><a href="#" class="hover:text-catPink transition-colors">Help Center / FAQ</a></li>
+                        <li><a href="#" class="hover:text-catPink transition-colors">Shipping & Delivery</a></li>
+                        <li><a href="#" class="hover:text-catPink transition-colors">Returns & Refunds</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gray-700 mb-3">Newsletter</h4>
+                    <p class="text-xs text-gray-500 mb-2">Subscribe to receive purr-fect promos!</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="Your email address" class="w-full text-xs px-3 py-2 border border-pink-200 rounded-lg focus:outline-none focus:border-catPink">
+                        <button class="bg-catPink text-white text-xs px-3 py-2 rounded-lg hover:bg-catPinkDark shrink-0 transition-colors">Join</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-100 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 gap-4">
+                <p>&copy; 2026 Judy's Shopping Cat. All rights reserved.</p>
+                <div class="flex items-center gap-4 text-gray-500">
+                    <i class="fa-brands fa-cc-visa text-xl hover:text-gray-800"></i>
+                    <i class="fa-brands fa-cc-mastercard text-xl hover:text-gray-800"></i>
+                    <i class="fa-brands fa-cc-paypal text-xl hover:text-gray-800"></i>
+                    <i class="fa-brands fa-apple-pay text-xl hover:text-gray-800"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= SHOPPING CART DRAWER ================= -->
+    <div id="cartOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+    <div id="cartDrawer" class="cart-drawer fixed top-0 right-0 bottom-0 w-full sm:w-96 bg-white z-50 shadow-2xl transform translate-x-full flex flex-col justify-between">
+        
+        <!-- Cart Header -->
+        <div class="p-4 border-b border-gray-100 flex items-center justify-between bg-pink-50/50">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-cart-shopping text-catPink"></i>
+                <h3 class="font-bold text-gray-800">Your Shopping Bag</h3>
+                <span id="cartItemCount" class="bg-catPink/20 text-catPinkDark text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+            </div>
+            <button id="closeCartBtn" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:text-gray-800 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Cart Items List -->
+        <div id="cartItemsContainer" class="p-4 overflow-y-auto flex-grow space-y-4">
+            <!-- Dynamic Cart Items loaded via JS -->
+        </div>
+
+        <!-- Cart Empty Message -->
+        <div id="cartEmptyState" class="p-8 text-center flex-grow flex flex-col items-center justify-center">
+            <div class="w-16 h-16 bg-pink-50 text-pink-300 rounded-full flex items-center justify-center mb-3 text-2xl">
+                <i class="fa-solid fa-basket-shopping"></i>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Your cart is currently empty.</p>
+            <p class="text-xs text-gray-400 mt-1">Start adding goods to fill it up!</p>
+        </div>
+
+        <!-- Cart Footer & Total -->
+        <div id="cartFooter" class="p-4 border-t border-gray-100 bg-gray-50 space-y-3">
+            <div class="space-y-1 text-xs text-gray-500">
+                <div class="flex justify-between">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal" class="font-semibold text-gray-700">$0.00</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Estimated Shipping</span>
+                    <span class="text-green-600 font-medium">FREE</span>
+                </div>
+                <div class="flex justify-between text-sm font-bold text-gray-800 pt-2 border-t border-gray-200">
+                    <span>Total</span>
+                    <span id="cartTotal" class="text-catPinkDark text-base">$0.00</span>
+                </div>
+            </div>
+            <button id="checkoutBtn" class="w-full py-3 bg-catPink hover:bg-catPinkDark text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                <span>Proceed to Checkout</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-4 py-2.5 rounded-full shadow-xl z-50 flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toastMsg">Item added to cart!</span>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // Sample Product Database
+        const products = [
+            {
+                id: 1,
+                title: "Interactive Feather Cat Wand Toy",
+                category: "Cat Toys",
+                price: 12.99,
+                rating: 4.9,
+                reviews: 128,
+                image: "https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&w=500&q=80",
+                badge: "Bestseller"
+            },
+            {
+                id: 2,
+                title: "Cozy Plush Donut Pet Bed",
+                category: "Pet Supplies",
+                price: 29.50,
+                rating: 4.8,
+                reviews: 94,
+                image: "https://images.unsplash.com/photo-1591946614720-90a587da4a36?auto=format&fit=crop&w=500&q=80",
+                badge: "Hot Sale"
+            },
+            {
+                id: 3,
+                title: "Cute Feline Ear Wireless Headphones",
+                category: "Electronics",
+                price: 45.00,
+                rating: 4.7,
+                reviews: 210,
+                image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80",
+                badge: null
+            },
+            {
+                id: 4,
+                title: "Kawaii Kitty Ceramic Coffee Mug",
+                category: "Home & Living",
+                price: 15.99,
+                rating: 4.9,
+                reviews: 86,
+                image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=500&q=80",
+                badge: "New"
+            },
+            {
+                id: 5,
+                title: "Automatic Smart Water Fountain 2.5L",
+                category: "Pet Supplies",
+                price: 38.99,
+                rating: 4.6,
+                reviews: 150,
+                image: "https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=500&q=80",
+                badge: "Popular"
+            },
+            {
+                id: 6,
+                title: "Soft Paw Print Hoodie - Pink",
+                category: "Fashion",
+                price: 34.00,
+                rating: 4.5,
+                reviews: 67,
+                image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=500&q=80",
+                badge: null
+            },
+            {
+                id: 7,
+                title: "Cat-Shaped Mini Desk Lamp",
+                category: "Home & Living",
+                price: 18.50,
+                rating: 4.8,
+                reviews: 42,
+                image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=500&q=80",
+                badge: null
+            },
+            {
+                id: 8,
+                title: "Catnip Scratching Post Tower",
+                category: "Cat Toys",
+                price: 52.00,
+                rating: 4.9,
+                reviews: 310,
+                image: "https://images.unsplash.com/photo-1513205539453-15795493b821?auto=format&fit=crop&w=500&q=80",
+                badge: "Top Choice"
+            }
+        ];
+
+        // State Management
+        let cart = [];
+        let activeCategory = "All";
+        let searchQuery = "";
+        let currentSort = "featured";
+
+        // DOM Elements
+        const productGrid = document.getElementById("productGrid");
+        const categoryContainer = document.getElementById("categoryContainer");
+        const searchInput = document.getElementById("searchInput");
+        const searchBtn = document.getElementById("searchBtn");
+        const clearSearchBtn = document.getElementById("clearSearchBtn");
+        const sortSelect = document.getElementById("sortSelect");
+        const emptyState = document.getElementById("emptyState");
+        const resetSearchBtn = document.getElementById("resetSearchBtn");
+        const resultsCount = document.getElementById("resultsCount");
+
+        // Cart DOM Elements
+        const cartBtn = document.getElementById("cartBtn");
+        const mobileCartBtn = document.getElementById("mobileCartBtn");
+        const closeCartBtn = document.getElementById("closeCartBtn");
+        const cartDrawer = document.getElementById("cartDrawer");
+        const cartOverlay = document.getElementById("cartOverlay");
+        const cartBadge = document.getElementById("cartBadge");
+        const mobileCartBadge = document.getElementById("mobileCartBadge");
+        const cartItemCount = document.getElementById("cartItemCount");
+        const cartItemsContainer = document.getElementById("cartItemsContainer");
+        const cartEmptyState = document.getElementById("cartEmptyState");
+        const cartFooter = document.getElementById("cartFooter");
+        const cartSubtotal = document.getElementById("cartSubtotal");
+        const cartTotal = document.getElementById("cartTotal");
+        const checkoutBtn = document.getElementById("checkoutBtn");
+        const toast = document.getElementById("toast");
+        const toastMsg = document.getElementById("toastMsg");
+
+        // Initialize App
+        function init() {
+            renderCategories();
+            renderProducts();
+            setupEventListeners();
+            updateCartUI();
+        }
+
+        // Render Categories Bar
+        function renderCategories() {
+            const categories = ["All", ...new Set(products.map(p => p.category))];
+            categoryContainer.innerHTML = categories.map(cat => `
+                <button 
+                    onclick="filterCategory('${cat}')" 
+                    class="px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                        activeCategory === cat 
+                        ? 'bg-catPink text-white shadow-md' 
+                        : 'bg-white text-gray-600 hover:bg-pink-100 border border-pink-100'
+                    }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        // Filter Category Handler
+        window.filterCategory = function(category) {
+            activeCategory = category;
+            renderCategories();
+            renderProducts();
+        };
+
+        // Render Product Cards
+        function renderProducts() {
+            let filtered = products.filter(p => {
+                const matchesCategory = activeCategory === "All" || p.category === activeCategory;
+                const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      p.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            // Sorting
+            if (currentSort === "low-high") {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (currentSort === "high-low") {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (currentSort === "rating") {
+                filtered.sort((a, b) => b.rating - a.rating);
+            }
+
+            // Results count
+            resultsCount.textContent = `Showing ${filtered.length} of ${products.length} goods`;
+
+            // Display Empty State if no products match
+            if (filtered.length === 0) {
+                productGrid.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                return;
+            } else {
+                emptyState.classList.add("hidden");
+            }
+
+            // Render Grid
+            productGrid.innerHTML = filtered.map(product => `
+                <div class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between border border-pink-100/60 group">
+                    <div>
+                        <!-- Product Image Container -->
+                        <div class="relative w-full h-48 rounded-xl overflow-hidden mb-3 bg-gray-100">
+                            <img src="${product.image}" alt="${product.title}" 
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                onerror="this.src='https://placehold.co/500x500/FF85A1/ffffff?text=Judy%27s+Goods'">
+                            
+                            ${product.badge ? `
+                                <span class="absolute top-2 left-2 bg-catPink text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                                    ${product.badge}
+                                </span>
+                            ` : ''}
+
+                            <button class="absolute top-2 right-2 w-8 h-8 bg-white/80 hover:bg-white text-gray-400 hover:text-catPink rounded-full flex items-center justify-center transition-colors shadow-sm backdrop-blur-sm">
+                                <i class="fa-regular fa-heart text-xs"></i>
+                            </button>
+                        </div>
+
+                        <!-- Product Meta -->
+                        <div class="text-[11px] font-semibold text-catPink uppercase tracking-wider mb-1">${product.category}</div>
+                        <h3 class="font-bold text-gray-800 text-sm line-clamp-2 mb-2 group-hover:text-catPink transition-colors">${product.title}</h3>
+                        
+                        <!-- Ratings -->
+                        <div class="flex items-center gap-1 mb-3">
+                            <div class="flex text-amber-400 text-xs">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <span class="text-xs font-bold text-gray-700">${product.rating}</span>
+                            <span class="text-[11px] text-gray-400">(${product.reviews})</span>
+                        </div>
+                    </div>
+
+                    <!-- Price & Add Button -->
+                    <div class="flex items-center justify-between pt-2 border-t border-gray-50">
+                        <div>
+                            <span class="text-xs text-gray-400 block -mb-1">Price</span>
+                            <span class="text-lg font-bold text-gray-900">$${product.price.toFixed(2)}</span>
+                        </div>
+                        <button onclick="addToCart(${product.id})" class="bg-catPink hover:bg-catPinkDark text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>Add</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart Actions
+        window.addToCart = function(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartUI();
+            showToast(`Added "${product.title}" to your cart!`);
+        };
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateQuantity(productId, change) {
+            const item = cart.find(i => i.id === productId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            // Count items
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadge.textContent = totalCount;
+            mobileCartBadge.textContent = totalCount;
+            cartItemCount.textContent = totalCount;
+
+            if (totalCount > 0) {
+                mobileCartBadge.classList.remove('hidden');
+            } else {
+                mobileCartBadge.classList.add('hidden');
+            }
+
+            // Toggle Empty State in Drawer
+            if (cart.length === 0) {
+                cartEmptyState.classList.remove('hidden');
+                cartItemsContainer.classList.add('hidden');
+                cartFooter.classList.add('hidden');
+            } else {
+                cartEmptyState.classList.add('hidden');
+                cartItemsContainer.classList.remove('hidden');
+                cartFooter.classList.remove('hidden');
+            }
+
+            // Render Cart Items
+            cartItemsContainer.innerHTML = cart.map(item => `
+                <div class="flex items-center gap-3 p-2 bg-pink-50/40 rounded-xl border border-pink-100">
+                    <img src="${item.image}" alt="${item.title}" class="w-16 h-16 object-cover rounded-lg shrink-0 border border-white">
+                    <div class="flex-grow min-w-0">
+                        <h4 class="text-xs font-bold text-gray-800 truncate">${item.title}</h4>
+                        <div class="text-xs font-semibold text-catPinkDark mt-0.5">$${(item.price * item.quantity).toFixed(2)}</div>
+                        
+                        <!-- Quantity Control -->
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="flex items-center border border-gray-200 rounded-lg bg-white">
+                                <button onclick="updateQuantity(${item.id}, -1)" class="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-catPink font-bold text-xs">-</button>
+                                <span class="px-2 text-xs font-semibold text-gray-700">${item.quantity}</span>
+                                <button onclick="updateQuantity(${item.id}, 1)" class="w-6 h-6 flex items-center justify-center text-gray-500 hover:text-catPink font-bold text-xs">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-gray-400 hover:text-red-500 p-2 transition-colors">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            // Totals
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            cartSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+            cartTotal.textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        // Cart Drawer Open/Close
+        function openCart() {
+            cartDrawer.classList.remove("translate-x-full");
+            cartOverlay.classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
+
+        function closeCart() {
+            cartDrawer.classList.add("translate-x-full");
+            cartOverlay.classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        // Toast Helper
+        function showToast(message) {
+            toastMsg.textContent = message;
+            toast.classList.remove("translate-y-20", "opacity-0");
+            toast.classList.add("translate-y-0", "opacity-100");
+
+            setTimeout(() => {
+                toast.classList.remove("translate-y-0", "opacity-100");
+                toast.classList.add("translate-y-20", "opacity-0");
+            }, 2500);
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Cart drawer toggles
+            cartBtn.addEventListener("click", openCart);
+            mobileCartBtn.addEventListener("click", openCart);
+            closeCartBtn.addEventListener("click", closeCart);
+            cartOverlay.addEventListener("click", closeCart);
+
+            // Search inputs
+            searchInput.addEventListener("input", (e) => {
+                searchQuery = e.target.value;
+                if (searchQuery.trim().length > 0) {
+                    clearSearchBtn.classList.remove("hidden");
+                } else {
+                    clearSearchBtn.classList.add("hidden");
+                }
+                renderProducts();
+            });
+
+            searchBtn.addEventListener("click", () => {
+                renderProducts();
+            });
+
+            clearSearchBtn.addEventListener("click", () => {
+                searchInput.value = "";
+                searchQuery = "";
+                clearSearchBtn.classList.add("hidden");
+                renderProducts();
+            });
+
+            resetSearchBtn.addEventListener("click", () => {
+                searchInput.value = "";
+                searchQuery = "";
+                activeCategory = "All";
+                clearSearchBtn.classList.add("hidden");
+                renderCategories();
+                renderProducts();
+            });
+
+            // Sorting
+            sortSelect.addEventListener("change", (e) => {
+                currentSort = e.target.value;
+                renderProducts();
+            });
+
+            // Checkout button simulation
+            checkoutBtn.addEventListener("click", () => {
+                if (cart.length > 0) {
+                    showToast("Order placed successfully! Meow thanks!");
+                    cart = [];
+                    updateCartUI();
+                    closeCart();
+                }
+            });
+        }
+
+        // Run on Page Load
+        window.onload = init;
+    </script>
+</body>
+</html>
